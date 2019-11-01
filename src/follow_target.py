@@ -22,6 +22,7 @@ def main():
   logger.addHandler(handler)
 
   colour_ranges = {
+    # Ranges handle the slight shadow towards the bottom of the objects
     'yellow': ((0, 100, 100), (50, 255, 255)),
     'blue': ((100, 0, 0), (255, 50, 50)),
     'green': ((0, 100, 0), (50, 255, 50)),
