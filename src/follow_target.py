@@ -5,6 +5,7 @@ import sys
 
 import cv2
 import message_filters
+import numpy as np
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
@@ -20,14 +21,37 @@ def main():
   handler.setLevel(logging.INFO)
   logger.addHandler(handler)
 
+  colour_ranges = {
+    'yellow': ((0, 100, 100), (100, 255, 255)),
+    'blue': ((100, 0, 0), (255, 50, 50)),
+    'green': ((0, 100, 0), (50, 255, 50)),
+    'red': ((0, 0, 100), (0, 0, 255)),
+  }
+
+  def threshold_center(image, colour_range):
+    mask = cv2.inRange(image, *colour_range)
+    M = cv2.moments(mask)
+    cx = int(M['m10'] / M['m00'])
+    cy = int(M['m01'] / M['m00'])
+    return np.array([cx, cy])
+
+  def threshold_centers(image):
+    return {
+      colour_name: threshold_center(image, colour_range)
+      for colour_name, colour_range in colour_ranges.items()
+    }
+
   def camera_callback(data_1, data_2):
     # Allow exceptions to bubble up: they are logged automatically, and will
     # stop the rest of the callback running
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
-    logger.info('Image 1 %s', image_1.shape)
-    logger.info('Image 2 %s', image_2.shape)
+    centers_1 = threshold_centers(image_1)
+    centers_2 = threshold_centers(image_2)
+
+    logger.info('centers_1: %s', centers_1)
+    logger.info('centers_2: %s', centers_2)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
