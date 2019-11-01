@@ -24,7 +24,7 @@ def main():
     # Allow exceptions to bubble up: they are logged automatically, and will
     # stop the rest of the callback running
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
-    image_2 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
+    image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
     logger.info('Image 1 %s', image_1.shape)
     logger.info('Image 2 %s', image_2.shape)
