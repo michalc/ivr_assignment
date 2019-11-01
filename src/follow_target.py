@@ -40,10 +40,10 @@ def main():
     cy = int(M['m01'] / M['m00'])
     return np.array([cx, cy])
 
-  def threshold_centers(image):
+  def threshold_centers(image, range_names):
     return {
-      colour_name: threshold_center(image, colour_range)
-      for colour_name, colour_range in colour_ranges.items()
+      range_name: threshold_center(image, colour_ranges[range_name])
+      for range_name in range_names
     }
 
   def camera_callback(data_1, data_2):
@@ -52,8 +52,8 @@ def main():
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
-    centers_1 = threshold_centers(image_1)
-    centers_2 = threshold_centers(image_2)
+    centers_1 = threshold_centers(image_1, ('yellow', 'blue', 'green', 'red'))
+    centers_2 = threshold_centers(image_2, ('yellow', 'blue', 'green', 'red'))
 
     logger.info('centers_1: %s', centers_1)
     logger.info('centers_2: %s', centers_2)
