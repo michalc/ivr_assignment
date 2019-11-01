@@ -26,6 +26,7 @@ def main():
     'blue': ((100, 0, 0), (255, 50, 50)),
     'green': ((0, 100, 0), (50, 255, 50)),
     'red': ((0, 0, 100), (0, 0, 255)),
+    'orange': ((75, 110, 130), (95, 175, 220)),
   }
 
   def threshold_center(image, colour_range):
