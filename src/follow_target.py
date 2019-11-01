@@ -30,19 +30,19 @@ def main():
   }
   dilate_kernel = np.ones((5, 5), np.uint8)
 
-  def threshold_center(image, colour_range):
-    mask_threshold = cv2.inRange(image, *colour_range)
-    # Dilation allows a better center of mass calculation, as long as we know there is only one
-    # source of colour in the image, and the shape fairly regular
-    mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
-    M = cv2.moments(mask_threshold_dilate)
-    cx = int(M['m10'] / M['m00'])
-    cy = int(M['m01'] / M['m00'])
-    return np.array([cx, cy])
-
   def threshold_centers(image, range_names):
+    def threshold_center(colour_range):
+      mask_threshold = cv2.inRange(image, *colour_range)
+      # Dilation allows a better center of mass calculation, as long as we know there is only one
+      # source of colour in the image, and the shape fairly regular
+      mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
+      M = cv2.moments(mask_threshold_dilate)
+      cx = int(M['m10'] / M['m00'])
+      cy = int(M['m01'] / M['m00'])
+      return np.array([cx, cy])
+
     return {
-      range_name: threshold_center(image, colour_ranges[range_name])
+      range_name: threshold_center(colour_ranges[range_name])
       for range_name in range_names
     }
 
