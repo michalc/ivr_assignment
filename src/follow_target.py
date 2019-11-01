@@ -21,7 +21,8 @@ def main():
   logger.addHandler(handler)
 
   def camera_callback(data_1, data_2):
-    # Allow exceptions to bubble up: they are logged automatically
+    # Allow exceptions to bubble up: they are logged automatically, and will
+    # stop the rest of the callback running
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
 
