@@ -33,8 +33,8 @@ def main():
   def threshold_centers(image, range_names):
     def threshold_center(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
-      # Dilation allows a better center of mass calculation, as long as we know there is only one
-      # source of colour in the image, and the shape fairly regular
+      # Dilation gives a better center of mass calculation, as long there is only one source of
+      # the colour, and the real-world shape is fairly regular
       mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
       M = cv2.moments(mask_threshold_dilate)
       cx = int(M['m10'] / M['m00'])
