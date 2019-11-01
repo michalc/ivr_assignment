@@ -22,7 +22,11 @@ def main():
   def camera1_callback(_):
     logger.info('/camera1/robot/image_raw callback')
 
+  def camera2_callback(_):
+    logger.info('/camera2/robot/image_raw callback')
+
   rospy.Subscriber('/camera1/robot/image_raw', Image, camera1_callback)
+  rospy.Subscriber('/camera2/robot/image_raw', Image, camera2_callback)
 
   try:
     rospy.spin()
