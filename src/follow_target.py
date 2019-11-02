@@ -48,16 +48,37 @@ def main():
       for range_name in range_names
     }
 
-  def calc_connected_comp_stats_no_background(image, range_names):
-    def calc_connected_comp_stat(colour_range):
+  def calc_circ_rect_centers(image, range_names):
+    # The box could be entirely hidden by the robot, so we can't assume both orange regions are
+    # visible and use watershedding. We would want to erode to remove noise, but the box is quite
+    # small and eroding can erode it entirely
+
+    def area_proportion(stats):
+      return float(stats[cv2.CC_STAT_AREA]) / (stats[cv2.CC_STAT_HEIGHT] * stats[cv2.CC_STAT_WIDTH])
+
+    def centre(stats):
+      return np.array([
+        stats[cv2.CC_STAT_LEFT] + stats[cv2.CC_STAT_WIDTH] / 2,
+        stats[cv2.CC_STAT_TOP] + stats[cv2.CC_STAT_HEIGHT] / 2,
+      ])
+
+    def calc_circ_rect_center(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
       mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
       _, _, stats, _ = cv2.connectedComponentsWithStats(mask_threshold_dilate)
-      # From assumption of the environment, one component will have the same bounds as the image
-      return stats[stats[:,cv2.CC_STAT_HEIGHT] != image.shape[0]]
+
+      # Rough way to distinguish circle from rectangle if both quite visible: the rectangle will
+      # have a larger proportion of pixels in its bounding box
+      stats = stats[stats[:,cv2.CC_STAT_HEIGHT] != image.shape[0]]             # Remove background
+      stats = stats[stats[:,cv2.CC_STAT_AREA].argsort()][-2:]                  # Take the largest two by area, in case of extra noise
+      stats = stats[np.apply_along_axis(area_proportion, 1, stats).argsort()]  # Sort by proportion of area
+
+      return \
+        (centre(stats[0]), centre(stats[1])) if stats.shape[0] == 2 else \
+        (None, None)
 
     return {
-      range_name: calc_connected_comp_stat(colour_ranges[range_name])
+      range_name: calc_circ_rect_center(colour_ranges[range_name])
       for range_name in range_names
     }
 
@@ -73,14 +94,11 @@ def main():
     logger.info('threshold_centers_1: %s', threshold_centers_1)
     logger.info('threshold_centers_2: %s', threshold_centers_2)
 
-    # The box could be entirely hidden by the robot, so we can't assume both orange regions are
-    # visible and use watershedding. We would want to erode to remove noise, but the box is quite
-    # small and eroding can erode it entirely
-    orange_stats_1 = calc_connected_comp_stats_no_background(image_1, ('orange',))['orange']
-    orange_stats_2 = calc_connected_comp_stats_no_background(image_2, ('orange',))['orange']
+    orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
+    orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
 
-    logger.info('orange_stats_1: %s', orange_stats_1)
-    logger.info('orange_stats_2: %s', orange_stats_2)
+    logger.info('orange_circ_center_1: %s, orange_rect_center_1: %s', orange_circ_center_1, orange_rect_center_1)
+    logger.info('orange_circ_center_2: %s, orange_rect_center_2: %s', orange_circ_center_2, orange_rect_center_2)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
