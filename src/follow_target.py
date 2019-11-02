@@ -31,8 +31,8 @@ def main():
   }
   dilate_kernel = np.ones((5, 5), np.uint8)
 
-  def threshold_centers(image, range_names):
-    def threshold_center(colour_range):
+  def calc_threshold_centers(image, range_names):
+    def calc_threshold_center(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
       # Dilation gives a better center of mass calculation, since it partially compensates for
       # occlusion, as long there is only one source of the colour, and the real-world shape is
@@ -44,7 +44,7 @@ def main():
       return np.array([cx, cy])
 
     return {
-      range_name: threshold_center(colour_ranges[range_name])
+      range_name: calc_threshold_center(colour_ranges[range_name])
       for range_name in range_names
     }
 
@@ -54,11 +54,11 @@ def main():
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
-    centers_1 = threshold_centers(image_1, ('yellow', 'blue', 'green', 'red'))
-    centers_2 = threshold_centers(image_2, ('yellow', 'blue', 'green', 'red'))
+    threshold_centers_1 = calc_threshold_centers(image_1, ('yellow', 'blue', 'green', 'red'))
+    threshold_centers_2 = calc_threshold_centers(image_2, ('yellow', 'blue', 'green', 'red'))
 
-    logger.info('centers_1: %s', centers_1)
-    logger.info('centers_2: %s', centers_2)
+    logger.info('threshold_centers_1: %s', threshold_centers_1)
+    logger.info('threshold_centers_2: %s', threshold_centers_2)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
