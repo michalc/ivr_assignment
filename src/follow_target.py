@@ -48,8 +48,8 @@ def main():
       for range_name in range_names
     }
 
-  def calc_connected_comp_bounds(image, range_names):
-    def calc_connected_comp_bound(colour_range):
+  def calc_connected_comp_stats(image, range_names):
+    def calc_connected_comp_stat(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
       mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
       _, _, stats, _ = cv2.connectedComponentsWithStats(mask_threshold_dilate)
@@ -57,7 +57,7 @@ def main():
       return stats[stats[:,cv2.CC_STAT_HEIGHT] != image.shape[0]]
 
     return {
-      range_name: calc_connected_comp_bound(colour_ranges[range_name])
+      range_name: calc_connected_comp_stat(colour_ranges[range_name])
       for range_name in range_names
     }
 
@@ -76,11 +76,11 @@ def main():
     # The box could be entirely hidden by the robot, so we can't assume both orange regions are
     # visible and use watershedding. We would want to erode to remove noise, but the box is quite
     # small and eroding can erode it entirely
-    connected_comp_bounds_1 = calc_connected_comp_bounds(image_1, ('orange',))
-    connected_comp_bounds_2 = calc_connected_comp_bounds(image_2, ('orange',))
+    connected_comp_stats_1 = calc_connected_comp_stats(image_1, ('orange',))
+    connected_comp_stats_2 = calc_connected_comp_stats(image_2, ('orange',))
 
-    logger.info('connected_comp_bounds_1: %s', connected_comp_bounds_1)
-    logger.info('connected_comp_bounds_2: %s', connected_comp_bounds_2)
+    logger.info('connected_comp_stats_1: %s', connected_comp_stats_1)
+    logger.info('connected_comp_stats_2: %s', connected_comp_stats_2)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
