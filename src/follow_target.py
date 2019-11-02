@@ -33,12 +33,12 @@ def main():
 
   def calc_center_of_masses(image, range_names):
     def calc_center_of_mass(colour_range):
-      mask_threshold = cv2.inRange(image, *colour_range)
+      mask = cv2.inRange(image, *colour_range)
       # Dilation gives a better center of mass calculation, since it partially compensates for
       # occlusion, as long there is only one source of the colour, and the real-world shape is
       # fairly regular
-      mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
-      M = cv2.moments(mask_threshold_dilate)
+      mask = cv2.dilate(mask, dilate_kernel, iterations=3)
+      M = cv2.moments(mask)
       return np.array([int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])])
 
     return {
@@ -61,9 +61,9 @@ def main():
       ])
 
     def calc_circ_rect_center(colour_range):
-      mask_threshold = cv2.inRange(image, *colour_range)
-      mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
-      _, _, stats, _ = cv2.connectedComponentsWithStats(mask_threshold_dilate)
+      mask = cv2.inRange(image, *colour_range)
+      mask = cv2.dilate(mask, dilate_kernel, iterations=3)
+      _, _, stats, _ = cv2.connectedComponentsWithStats(mask)
 
       # Rough way to distinguish circle from rectangle if both quite visible: the rectangle will
       # have a larger proportion of pixels in its bounding box
