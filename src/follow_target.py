@@ -80,6 +80,17 @@ def main():
       for range_name in range_names
     }
 
+  def pixel_coords_to_meters_converter(meters_per_pixel, origin_pixels):
+    def _coords_convert(coords_pixels):
+      return \
+        None if coords_pixels is None else \
+        np.array([
+          (coords_pixels[0] - origin_pixels[0]) * meters_per_pixel,
+          (origin_pixels[1] - coords_pixels[1]) * meters_per_pixel  # Pixel y coords opposite to base frame
+        ])
+
+    return _coords_convert
+
   def camera_callback(data_1, data_2):
     # Allow exceptions to bubble up: they are logged automatically, and will
     # stop the rest of the callback running
@@ -89,12 +100,36 @@ def main():
     joint_centers_1 = calc_center_of_masses(image_1, ('yellow', 'blue', 'green', 'red'))
     joint_centers_2 = calc_center_of_masses(image_2, ('yellow', 'blue', 'green', 'red'))
 
-    logger.info('joint_centers_1: %s', joint_centers_1)
-    logger.info('joint_centers_2: %s', joint_centers_2)
-
     orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
     orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
 
+    # Use blue and yellow to convert from pixels to meters, since we know/assume they can't be
+    # obscured, know the meter distance between them, and they can't move
+    # We create conversions for both cameras, in case they are different
+    meters_per_pixel_1 = 2.0 / (joint_centers_1['yellow'][1] - joint_centers_1['blue'][1])
+    meters_per_pixel_2 = 2.0 / (joint_centers_2['yellow'][1] - joint_centers_2['blue'][1])
+
+    # Convert all pixel coordinates to their meter coordinates, based on origin 0.5m below the
+    # yellow circle
+    pixel_coords_to_meters_1 = pixel_coords_to_meters_converter(
+      meters_per_pixel_1, joint_centers_1['yellow'] + np.array([0, 0.5 / meters_per_pixel_1])
+    )
+    pixel_coords_to_meters_2 = pixel_coords_to_meters_converter(
+      meters_per_pixel_2, joint_centers_2['yellow'] + np.array([0, 0.5 / meters_per_pixel_2])
+    )
+    joint_centers_1 = {
+      range_name: pixel_coords_to_meters_1(coords) for range_name, coords in joint_centers_1.items()
+    }
+    joint_centers_2 = {
+      range_name: pixel_coords_to_meters_2(coords) for range_name, coords in joint_centers_2.items()
+    }
+    orange_circ_center_1 = pixel_coords_to_meters_1(orange_circ_center_1)
+    orange_rect_center_1 = pixel_coords_to_meters_1(orange_rect_center_1)
+    orange_circ_center_2 = pixel_coords_to_meters_1(orange_circ_center_2)
+    orange_rect_center_2 = pixel_coords_to_meters_1(orange_rect_center_2)
+
+    logger.info('joint_centers_1: %s', joint_centers_1)
+    logger.info('joint_centers_2: %s', joint_centers_2)
     logger.info('orange_circ_center_1: %s, orange_rect_center_1: %s', orange_circ_center_1, orange_rect_center_1)
     logger.info('orange_circ_center_2: %s, orange_rect_center_2: %s', orange_circ_center_2, orange_rect_center_2)
 
