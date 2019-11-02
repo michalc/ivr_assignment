@@ -135,8 +135,8 @@ def main():
     }
     orange_circ_center_1 = pixel_coords_to_meters_1(orange_circ_center_1)
     orange_rect_center_1 = pixel_coords_to_meters_1(orange_rect_center_1)
-    orange_circ_center_2 = pixel_coords_to_meters_1(orange_circ_center_2)
-    orange_rect_center_2 = pixel_coords_to_meters_1(orange_rect_center_2)
+    orange_circ_center_2 = pixel_coords_to_meters_2(orange_circ_center_2)
+    orange_rect_center_2 = pixel_coords_to_meters_2(orange_rect_center_2)
 
     # Combine the 2D coordinates to 3D
     joint_centers = {
