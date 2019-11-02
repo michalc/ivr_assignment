@@ -39,9 +39,7 @@ def main():
       # fairly regular
       mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
       M = cv2.moments(mask_threshold_dilate)
-      cx = int(M['m10'] / M['m00'])
-      cy = int(M['m01'] / M['m00'])
-      return np.array([cx, cy])
+      return np.array([int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])])
 
     return {
       range_name: calc_center_of_mass(colour_ranges[range_name])
