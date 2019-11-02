@@ -91,12 +91,12 @@ def main():
 
     return _coords_convert
 
-  def coords_2d_to_3d(x_z, y_z):
+  def coords_2d_to_3d(y_z, x_z):
     # For lack of anything better, we just average the z-coordates
     # Maybe could work with missing coordinates better further up the stack?
     return \
       None if x_z is None or y_z is None else \
-      np.array([x_z[0], y_z[0], (y_z[0] + y_z[0]) / 2])
+      np.array([x_z[0], y_z[0], (y_z[1] + y_z[1]) / 2])
 
   def camera_callback(data_1, data_2):
     # Allow exceptions to bubble up: they are logged automatically, and will
