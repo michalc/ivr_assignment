@@ -104,10 +104,12 @@ def main():
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
+    # Find joint positions
     joint_range_names = ('yellow', 'blue', 'green', 'red')
     joint_centers_1 = calc_center_of_masses(image_1, joint_range_names)
     joint_centers_2 = calc_center_of_masses(image_2, joint_range_names)
 
+    # Find orange object positions
     orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
     orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
 
