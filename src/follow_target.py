@@ -31,8 +31,8 @@ def main():
   }
   dilate_kernel = np.ones((5, 5), np.uint8)
 
-  def calc_threshold_centers(image, range_names):
-    def calc_threshold_center(colour_range):
+  def calc_center_of_masses(image, range_names):
+    def calc_center_of_mass(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
       # Dilation gives a better center of mass calculation, since it partially compensates for
       # occlusion, as long there is only one source of the colour, and the real-world shape is
@@ -44,7 +44,7 @@ def main():
       return np.array([cx, cy])
 
     return {
-      range_name: calc_threshold_center(colour_ranges[range_name])
+      range_name: calc_center_of_mass(colour_ranges[range_name])
       for range_name in range_names
     }
 
@@ -88,11 +88,11 @@ def main():
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
-    threshold_centers_1 = calc_threshold_centers(image_1, ('yellow', 'blue', 'green', 'red'))
-    threshold_centers_2 = calc_threshold_centers(image_2, ('yellow', 'blue', 'green', 'red'))
+    joint_centers_1 = calc_center_of_masses(image_1, ('yellow', 'blue', 'green', 'red'))
+    joint_centers_2 = calc_center_of_masses(image_2, ('yellow', 'blue', 'green', 'red'))
 
-    logger.info('threshold_centers_1: %s', threshold_centers_1)
-    logger.info('threshold_centers_2: %s', threshold_centers_2)
+    logger.info('joint_centers_1: %s', joint_centers_1)
+    logger.info('joint_centers_2: %s', joint_centers_2)
 
     orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
     orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
