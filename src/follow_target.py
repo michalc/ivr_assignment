@@ -76,11 +76,11 @@ def main():
     # The box could be entirely hidden by the robot, so we can't assume both orange regions are
     # visible and use watershedding. We would want to erode to remove noise, but the box is quite
     # small and eroding can erode it entirely
-    connected_comp_stats_1 = calc_connected_comp_stats_no_background(image_1, ('orange',))
-    connected_comp_stats_2 = calc_connected_comp_stats_no_background(image_2, ('orange',))
+    orange_stats_1 = calc_connected_comp_stats_no_background(image_1, ('orange',))['orange']
+    orange_stats_2 = calc_connected_comp_stats_no_background(image_2, ('orange',))['orange']
 
-    logger.info('connected_comp_stats_1: %s', connected_comp_stats_1)
-    logger.info('connected_comp_stats_2: %s', connected_comp_stats_2)
+    logger.info('orange_stats_1: %s', orange_stats_1)
+    logger.info('orange_stats_2: %s', orange_stats_2)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
