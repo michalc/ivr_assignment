@@ -48,7 +48,7 @@ def main():
       for range_name in range_names
     }
 
-  def calc_connected_comp_stats(image, range_names):
+  def calc_connected_comp_stats_no_background(image, range_names):
     def calc_connected_comp_stat(colour_range):
       mask_threshold = cv2.inRange(image, *colour_range)
       mask_threshold_dilate = cv2.dilate(mask_threshold, dilate_kernel, iterations=3)
@@ -76,8 +76,8 @@ def main():
     # The box could be entirely hidden by the robot, so we can't assume both orange regions are
     # visible and use watershedding. We would want to erode to remove noise, but the box is quite
     # small and eroding can erode it entirely
-    connected_comp_stats_1 = calc_connected_comp_stats(image_1, ('orange',))
-    connected_comp_stats_2 = calc_connected_comp_stats(image_2, ('orange',))
+    connected_comp_stats_1 = calc_connected_comp_stats_no_background(image_1, ('orange',))
+    connected_comp_stats_2 = calc_connected_comp_stats_no_background(image_2, ('orange',))
 
     logger.info('connected_comp_stats_1: %s', connected_comp_stats_1)
     logger.info('connected_comp_stats_2: %s', connected_comp_stats_2)
