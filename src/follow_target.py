@@ -8,11 +8,13 @@ import message_filters
 import numpy as np
 import rospy
 from sensor_msgs.msg import Image
+from std_msgs.msg import Float64MultiArray
 from cv_bridge import CvBridge, CvBridgeError
 
 
 def main():
   rospy.init_node('follow_target', anonymous=True)
+  circ_pub = rospy.Publisher("orange_circ_center", Float64MultiArray, queue_size=10)
   bridge = CvBridge()
 
   logger = logging.getLogger()
@@ -147,6 +149,9 @@ def main():
 
     logger.info('joint_centers: %s', joint_centers)
     logger.info('orange_circ_center: %s, orange_rect_center: %s', orange_circ_center, orange_rect_center)
+
+    if orange_circ_center is not None:
+      circ_pub.publish(Float64MultiArray(data=orange_circ_center))
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
