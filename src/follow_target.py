@@ -91,14 +91,22 @@ def main():
 
     return _coords_convert
 
+  def coords_2d_to_3d(x_z, y_z):
+    # For lack of anything better, we just average the z-coordates
+    # Maybe could work with missing coordinates better further up the stack?
+    return \
+      None if x_z is None or y_z is None else \
+      np.array([x_z[0], y_z[0], (y_z[0] + y_z[0]) / 2])
+
   def camera_callback(data_1, data_2):
     # Allow exceptions to bubble up: they are logged automatically, and will
     # stop the rest of the callback running
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
-    joint_centers_1 = calc_center_of_masses(image_1, ('yellow', 'blue', 'green', 'red'))
-    joint_centers_2 = calc_center_of_masses(image_2, ('yellow', 'blue', 'green', 'red'))
+    joint_range_names = ('yellow', 'blue', 'green', 'red')
+    joint_centers_1 = calc_center_of_masses(image_1, joint_range_names)
+    joint_centers_2 = calc_center_of_masses(image_2, joint_range_names)
 
     orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
     orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
@@ -128,10 +136,15 @@ def main():
     orange_circ_center_2 = pixel_coords_to_meters_1(orange_circ_center_2)
     orange_rect_center_2 = pixel_coords_to_meters_1(orange_rect_center_2)
 
-    logger.info('joint_centers_1: %s', joint_centers_1)
-    logger.info('joint_centers_2: %s', joint_centers_2)
-    logger.info('orange_circ_center_1: %s, orange_rect_center_1: %s', orange_circ_center_1, orange_rect_center_1)
-    logger.info('orange_circ_center_2: %s, orange_rect_center_2: %s', orange_circ_center_2, orange_rect_center_2)
+    # Combine the 2D coordinates to 3D
+    joint_centers = {
+      range_name: coords_2d_to_3d(joint_centers_1[range_name], joint_centers_2[range_name]) for range_name in joint_range_names
+    }
+    orange_circ_center = coords_2d_to_3d(orange_circ_center_1, orange_circ_center_2)
+    orange_rect_center = coords_2d_to_3d(orange_rect_center_1, orange_rect_center_2)
+
+    logger.info('joint_centers: %s', joint_centers)
+    logger.info('orange_circ_center: %s, orange_rect_center: %s', orange_circ_center, orange_rect_center)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
