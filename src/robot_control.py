@@ -3,6 +3,7 @@
 import logging
 import sys
 
+import cv2
 import message_filters
 import numpy as np
 import rospy
