@@ -23,7 +23,7 @@ def main():
   logger.addHandler(handler)
 
   def calc_jacobian(q):
-    # Cos and sign functions take 1-indexed as in mathematical notation
+    # cos and sin functions take 1-indexed as in mathematical notation
     def c(i):
       return np.cos(q[i - 1])
 
