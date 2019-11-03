@@ -135,15 +135,23 @@ def calc_positions_and_angles(image_1, image_2):
 
   green_to_red = joint_centers['red'] - joint_centers['green']
   blue_to_green = joint_centers['green'] - joint_centers['blue']
-  link_4 = np.arccos(np.dot(green_to_red, blue_to_green)/(np.linalg.norm(green_to_red) * np.linalg.norm(blue_to_green)))
+  yellow_to_blue = joint_centers['blue'] - joint_centers['yellow']
+  green_to_red_norm = np.linalg.norm(green_to_red)
+  blue_to_green_norm = np.linalg.norm(blue_to_green)
+  yellow_to_blue_norm = np.linalg.norm(yellow_to_blue)
+
+  link_2 = np.arccos(np.dot(blue_to_green, yellow_to_blue) / (blue_to_green_norm * yellow_to_blue_norm))
+  link_3 = 0.0  # For simplicity and to deal with visually indistinguisable states
+                # When used for control, we will enforce this constraint
+  link_4 = np.arccos(np.dot(green_to_red, blue_to_green) / (green_to_red_norm * blue_to_green_norm))
 
   return {
     'joint_centers': joint_centers,
     'orange_circ_center': orange_circ_center,
     'orange_rect_center': orange_rect_center,
     'link_1': None,
-    'link_2': None,
-    'link_3': None,
+    'link_2': link_2,
+    'link_3': link_3,
     'link_4': link_4,
   }
 
