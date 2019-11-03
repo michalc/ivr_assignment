@@ -144,7 +144,7 @@ def calc_positions_and_angles(image_1, image_2):
     'link_1': None,
     'link_2': None,
     'link_3': None,
-    'link_4': link_4
+    'link_4': link_4,
   }
 
 
