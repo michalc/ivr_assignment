@@ -157,10 +157,7 @@ def calc_positions_and_angles(image_1, image_2):
     'joint_centers': joint_centers,
     'orange_circ_center': orange_circ_center,
     'orange_rect_center': orange_rect_center,
-    'link_1': link_1,
-    'link_2': link_2,
-    'link_3': link_3,
-    'link_4': link_4,
+    'q': np.array([link_1, link_2, link_3, link_4]),
   }
 
 
