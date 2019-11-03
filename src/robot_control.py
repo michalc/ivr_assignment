@@ -22,13 +22,43 @@ def main():
   handler.setLevel(logging.INFO)
   logger.addHandler(handler)
 
+  def calc_jacobian(q):
+    # Cos and sign functions take 1-indexed as in mathematical notation
+    def c(i):
+      return np.cos(q[i - 1])
+
+    def s(i):
+      return np.sin(q[i - 1])
+
+    return np.array([
+      [
+        -2*s(1)*c(3)*c(4) -3*s(1)*s(3) +2*c(1)*c(2)*s(4),
+        -2*s(1)*s(2)*s(4),
+        +2*c(1)*c(3)*c(4) +3*c(1)*c(3),
+        -2*c(1)*s(3)*s(4) +2*s(1)*c(2)*c(4),
+      ],
+      [
+        +2*c(1)*s(3)*c(4) +3*c(1)*s(3) +2*s(1)*c(2)*s(4),
+        +2*c(1)*s(2)*s(4),
+        +2*s(1)*c(3)*c(4) +3*s(1)*c(3),
+        -2*s(1)*s(3)*s(4) -2*c(1)*c(2)*c(4),
+      ],
+      [
+        0.0,
+        -2*c(2)*s(4) - 2*s(2)*c(3)*c(4) - 3*c(2)*c(3),
+        -2*c(2)*s(3)*c(4) + 3*c(2)*s(3),
+        -2*s(2)*c(4) -2*c(2)*c(3)*s(4),
+      ],
+    ])
+
   def camera_callback(data_1, data_2):
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
     positions_and_angles = calc_positions_and_angles(image_1, image_2)
+    jacobian = calc_jacobian(positions_and_angles['q'])
 
-    logger.info('positions_and_angles: %s', positions_and_angles)
+    logger.info('jacobian %s', jacobian)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
