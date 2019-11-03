@@ -13,7 +13,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 def main():
-  rospy.init_node('follow_target', anonymous=True)
+  rospy.init_node('robot_vision', anonymous=True)
   circ_pub = rospy.Publisher("orange_circ_center", Float64MultiArray, queue_size=10)
   bridge = CvBridge()
 
