@@ -22,6 +22,20 @@ def main():
   handler.setLevel(logging.INFO)
   logger.addHandler(handler)
 
+  def calc_k(q):
+    # cos and sin functions take 1-indexed as in mathematical notation
+    def c(i):
+      return np.cos(q[i - 1])
+
+    def s(i):
+      return np.sin(q[i - 1])
+
+    return np.array([
+      +2*c(1)*s(3)*c(4) +2*c(1)*s(3) +2*s(1)*c(2)*s(4),
+      +2*s(1)*s(3)*c(4) +2*s(1)*s(3) -2*c(1)*c(2)*s(4),
+      -2*s(2)*c(3)*c(4) -3*s(2)*c(2)*c(4) +2,
+    ])
+
   def calc_jacobian(q):
     # cos and sin functions take 1-indexed as in mathematical notation
     def c(i):
@@ -56,8 +70,11 @@ def main():
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
     positions_and_angles = calc_positions_and_angles(image_1, image_2)
+
+    k = calc_k(positions_and_angles['q'])
     jacobian = calc_jacobian(positions_and_angles['q'])
 
+    logger.info('k %s', k)
     logger.info('jacobian %s', jacobian)
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
