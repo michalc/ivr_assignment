@@ -107,13 +107,13 @@ def calc_positions_and_angles(image_1, image_2):
   meters_per_pixel_1 = 2.0 / (joint_centers_1['yellow'][1] - joint_centers_1['blue'][1])
   meters_per_pixel_2 = 2.0 / (joint_centers_2['yellow'][1] - joint_centers_2['blue'][1])
 
-  # Convert all pixel coordinates to their meter coordinates, based on origin 1.0m below the
-  # yellow circle
+  # Convert all pixel coordinates to their meter coordinates
+  # (The commented out part I think makes it world-coords, since the robot is 0 + 1.0m up)
   pixel_coords_to_meters_1 = pixel_coords_to_meters_converter(
-    meters_per_pixel_1, joint_centers_1['yellow'] + np.array([0, 1.0 / meters_per_pixel_1])
+    meters_per_pixel_1, joint_centers_1['yellow'] # + np.array([0, 1.0 / meters_per_pixel_1])
   )
   pixel_coords_to_meters_2 = pixel_coords_to_meters_converter(
-    meters_per_pixel_2, joint_centers_2['yellow'] + np.array([0, 1.0 / meters_per_pixel_2])
+    meters_per_pixel_2, joint_centers_2['yellow'] # + np.array([0, 1.0 / meters_per_pixel_2])
   )
   joint_centers_1 = {
     range_name: pixel_coords_to_meters_1(coords) for range_name, coords in joint_centers_1.items()
