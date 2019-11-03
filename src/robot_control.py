@@ -7,6 +7,7 @@ import cv2
 import message_filters
 import numpy as np
 import rospy
+from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
@@ -15,6 +16,11 @@ from robot_vision import calc_positions_and_angles
 def main():
   rospy.init_node('robot_control', anonymous=True)
   bridge = CvBridge()
+
+  joint1_pub = rospy.Publisher("/robot/joint1_position_controller/command", Float64, queue_size=10)
+  joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
+  joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
+  joint4_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
 
   logger = logging.getLogger()
   logger.setLevel(logging.INFO)
@@ -65,17 +71,43 @@ def main():
       ],
     ])
 
+  state = {
+    't_-1': 0,
+    'x_-1': np.array([0.0, 0.0, 0.0]),
+  }
+
   def camera_callback(data_1, data_2):
     image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
     image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
 
     positions_and_angles = calc_positions_and_angles(image_1, image_2)
+    now = rospy.get_time()
+
+    first_time = state['t_-1'] == 0
+    x_t = positions_and_angles['orange_circ_center']
+    dt = now - state['t_-1']
+    dx = (x_t - state['x_-1']) / dt
+    q = positions_and_angles['q']
+  
+    state['t_-1'] = now
+    state['x_-1'] = x_t
+
+    if first_time:
+      return
+
+    jacobian = calc_jacobian(positions_and_angles['q'])
+    jacobian_inv = np.linalg.pinv(jacobian)
+
+    q_d = q + jacobian_inv.dot(dx)
+    logger.info('q_d %s', q_d)
 
     k = calc_k(positions_and_angles['q'])
-    jacobian = calc_jacobian(positions_and_angles['q'])
-
     logger.info('k %s', k)
-    logger.info('jacobian %s', jacobian)
+
+    joint1_pub.publish(Float64(data=q_d[0]))
+    joint2_pub.publish(Float64(data=q_d[1]))
+    joint3_pub.publish(Float64(data=q_d[2]))
+    joint4_pub.publish(Float64(data=q_d[3]))
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
