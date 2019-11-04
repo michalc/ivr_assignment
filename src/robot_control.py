@@ -20,7 +20,7 @@ def main():
   joint1_pub = rospy.Publisher("/robot/joint1_position_controller/command", Float64, queue_size=10)
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
-  joint4_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
+  joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
 
   logger = logging.getLogger()
   logger.setLevel(logging.INFO)
@@ -83,6 +83,10 @@ def main():
     positions_and_angles = calc_positions_and_angles(image_1, image_2)
     now = rospy.get_time()
 
+    # We weren't able to determine the position.
+    if positions_and_angles['orange_circ_center'] is None:
+      return
+
     first_time = state['t_-1'] == 0
     x_t = positions_and_angles['orange_circ_center']
     dt = now - state['t_-1']
@@ -98,7 +102,7 @@ def main():
     jacobian = calc_jacobian(positions_and_angles['q'])
     jacobian_inv = np.linalg.pinv(jacobian)
 
-    q_d = q + jacobian_inv.dot(dx)
+    q_d = q + dt * jacobian_inv.dot(dx)
     logger.info('q_d %s', q_d)
 
     k = calc_k(positions_and_angles['q'])
