@@ -148,7 +148,9 @@ def calc_positions_and_angles(image_1, image_2):
   red_to_blue = blue_x_y - red_x_y
   red_to_blue_norm = np.linalg.norm(red_to_blue)
 
-  link_1 = np.arccos(np.dot(red_to_blue, y_axis) / (red_to_blue_norm * y_axis_norm))
+  link_1 = \
+    np.arccos(np.dot(red_to_blue, y_axis) / (red_to_blue_norm * y_axis_norm)) if red_to_blue_norm else \
+    0.0  # If red to blue is completely vertical, we just assume no rotation
   link_2 = np.arccos(np.dot(blue_to_green, yellow_to_blue) / (blue_to_green_norm * yellow_to_blue_norm))
   link_3 = 0.0
   link_4 = np.arccos(np.dot(green_to_red, blue_to_green) / (green_to_red_norm * blue_to_green_norm))
