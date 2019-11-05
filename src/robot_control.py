@@ -13,6 +13,17 @@ from cv_bridge import CvBridge
 
 from robot_vision import calc_positions_and_angles
 
+K_p = np.array([
+  [1.0, 0.0, 0.0],
+  [0.0, 1.0, 0.0],
+  [0.0, 0.0, 1.0],
+])
+K_d = np.array([
+  [0.1, 0.0, 0.0],
+  [0.0, 0.1, 0.0],
+  [0.0, 0.0, 0.1],
+])
+
 def main():
   rospy.init_node('robot_control', anonymous=True)
   bridge = CvBridge()
@@ -77,6 +88,7 @@ def main():
   state = {
     't_-1': 0,
     'x_-1': np.array([0.0, 0.0, 0.0]),
+    'e_-1': np.array([0.0, 0.0, 0.0]),
   }
 
   def camera_callback(data_1, data_2):
@@ -92,21 +104,26 @@ def main():
 
     first_time = state['t_-1'] == 0
     x_t = positions_and_angles['orange_circ_center']
+    x_e = positions_and_angles['joint_centers']['red']
+    e_t = x_t - x_e
+
     dt = now - state['t_-1']
     dx = (x_t - state['x_-1']) / dt
-    q = positions_and_angles['q']
-  
+    de = (e_t - state['e_-1']) / dt
+
     state['t_-1'] = now
     state['x_-1'] = x_t
+    state['e_-1'] = e_t
 
     if first_time:
       return
 
+    q = positions_and_angles['q']
     jacobian = calc_jacobian(positions_and_angles['q'])
     q_const, jacobian_cons = constrain_link_3(q, jacobian)
     jacobian_inv = np.linalg.pinv(jacobian_cons)
 
-    q_d = q_const + dt * jacobian_inv.dot(dx) * 5
+    q_d = q_const + dt * jacobian_inv.dot(K_p.dot(e_t) + K_d.dot(de))
     logger.info('q_d %s', q_d)
 
     k = calc_k(positions_and_angles['q'])
