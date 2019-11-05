@@ -71,6 +71,9 @@ def main():
       ],
     ])
 
+  def constrain_link_3(q, jacobian):
+    return np.delete(q, 2,), np.delete(jacobian, 2, 1)
+
   state = {
     't_-1': 0,
     'x_-1': np.array([0.0, 0.0, 0.0]),
@@ -100,9 +103,10 @@ def main():
       return
 
     jacobian = calc_jacobian(positions_and_angles['q'])
-    jacobian_inv = np.linalg.pinv(jacobian)
+    q_const, jacobian_cons = constrain_link_3(q, jacobian)
+    jacobian_inv = np.linalg.pinv(jacobian_cons)
 
-    q_d = q + dt * jacobian_inv.dot(dx)
+    q_d = q_const + dt * jacobian_inv.dot(dx) * 5
     logger.info('q_d %s', q_d)
 
     k = calc_k(positions_and_angles['q'])
@@ -110,8 +114,8 @@ def main():
 
     joint1_pub.publish(Float64(data=q_d[0]))
     joint2_pub.publish(Float64(data=q_d[1]))
-    joint3_pub.publish(Float64(data=q_d[2]))
-    joint4_pub.publish(Float64(data=q_d[3]))
+    joint3_pub.publish(Float64(data=0.0))
+    joint4_pub.publish(Float64(data=q_d[2]))
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
