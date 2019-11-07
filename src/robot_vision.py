@@ -165,6 +165,7 @@ def calc_positions_and_angles(image_1, image_2):
 
 def main():
   rospy.init_node('robot_vision', anonymous=True)
+  q_pub = rospy.Publisher("q", Float64MultiArray, queue_size=10)
   circ_pub = rospy.Publisher("orange_circ_center", Float64MultiArray, queue_size=10)
   bridge = CvBridge()
 
@@ -184,6 +185,7 @@ def main():
 
     logger.info('positions_and_angles: %s', positions_and_angles)
 
+    q_pub.publish(Float64MultiArray(data=positions_and_angles['q']))
     if positions_and_angles['orange_circ_center'] is not None:
       circ_pub.publish(Float64MultiArray(data=positions_and_angles['orange_circ_center']))
 
