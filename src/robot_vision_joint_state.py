@@ -21,7 +21,11 @@ def main():
   state = {
     'q': None,
     'angles_command': [
-      np.array([1.0, 1.0, 1.0, 1.0]),
+      np.array([0.0, 0.0, 0.0, 0.0]),
+      np.array([np.pi/4, np.pi/4, 0.0, np.pi/4]),
+      np.array([np.pi/4, np.pi/4, 0.0, np.pi/2]),
+      np.array([np.pi/2, np.pi/4, 0.0, np.pi/4]),
+      np.array([3*np.pi/4, np.pi/4, 0.0, np.pi/2]),
     ],
   }
 
