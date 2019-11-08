@@ -98,11 +98,11 @@ def main():
     now = rospy.get_time()
 
     # We weren't able to determine the position.
-    if positions_and_angles['orange_circ_center'] is None:
+    if positions_and_angles['target_center'] is None:
       return
 
     first_time = state['t_-1'] == 0
-    x_t = positions_and_angles['orange_circ_center']
+    x_t = positions_and_angles['target_center']
     x_e = positions_and_angles['joint_centers']['red']
     e_t = x_t - x_e
 
