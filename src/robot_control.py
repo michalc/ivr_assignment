@@ -3,7 +3,6 @@
 import logging
 import sys
 
-import cv2
 import message_filters
 import numpy as np
 import rospy
@@ -140,11 +139,7 @@ def main():
     .ApproximateTimeSynchronizer([camera_1_sub, camera_2_sub], queue_size=1, slop=0.01) \
     .registerCallback(camera_callback)
 
-  try:
-    rospy.spin()
-  except KeyboardInterrupt:
-    logger.info('Shutting down')
-  cv2.destroyAllWindows()
+  rospy.spin()
 
 if __name__ == '__main__':
     main()
