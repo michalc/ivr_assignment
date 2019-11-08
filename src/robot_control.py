@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import logging
-import sys
-
 import message_filters
 import numpy as np
 import rospy
@@ -31,12 +28,6 @@ def main():
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
-
-  logger = logging.getLogger()
-  logger.setLevel(logging.INFO)
-  handler = logging.StreamHandler(sys.stdout)
-  handler.setLevel(logging.INFO)
-  logger.addHandler(handler)
 
   def calc_k(q):
     # cos and sin functions take 1-indexed as in mathematical notation
@@ -123,10 +114,10 @@ def main():
     jacobian_inv = np.linalg.pinv(jacobian_cons)
 
     q_d = q_const + dt * jacobian_inv.dot(K_p.dot(e_t) + K_d.dot(de))
-    logger.info('q_d %s', q_d)
+    print('q_d', q_d)
 
     k = calc_k(positions_and_angles['q'])
-    logger.info('k %s', k)
+    print('k', k)
 
     joint1_pub.publish(Float64(data=q_d[0]))
     joint2_pub.publish(Float64(data=q_d[1]))
