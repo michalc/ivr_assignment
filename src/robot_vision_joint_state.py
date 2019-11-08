@@ -21,7 +21,7 @@ def main():
 
   state = {
     'q': None,
-    'angles_command': [
+    'desired_joint_config': [
       np.array([0.0, 0.0, 0.0, 0.0]),
       np.array([np.pi/4, np.pi/4, 0.0, np.pi/4]),
       np.array([np.pi/4, np.pi/4, 0.0, np.pi/2]),
@@ -43,19 +43,19 @@ def main():
 
   def move_robot(_):
     try:
-      angles = state['angles_command'].pop()
+      joint_config = state['desired_joint_config'].pop()
     except IndexError:
-      rospy.core.signal_shutdown('No more angles')
+      rospy.core.signal_shutdown('No more joint configurations')
       return
 
-    print('Moving to:', angles)
-    joint1_pub.publish(Float64(data=angles[0]))
-    joint2_pub.publish(Float64(data=angles[1]))
-    joint3_pub.publish(Float64(data=angles[2]))
-    joint4_pub.publish(Float64(data=angles[3]))
+    print('Moving to:', joint_config)
+    joint1_pub.publish(Float64(data=joint_config[0]))
+    joint2_pub.publish(Float64(data=joint_config[1]))
+    joint3_pub.publish(Float64(data=joint_config[2]))
+    joint4_pub.publish(Float64(data=joint_config[3]))
     rospy.sleep(3)
     print('Estimated angles:', state['q'])
-    joint4_pub.publish(Float64MultiArray(data=state['q']))
+    q_pub.publish(Float64MultiArray(data=state['q']))
     rospy.Timer(rospy.Duration(1), move_robot, oneshot=True)
 
   rospy.Timer(rospy.Duration(3), move_robot, oneshot=True)
