@@ -32,7 +32,7 @@ def calc_positions_and_angles(image_1, image_2):
       for range_name in range_names
     }
 
-  def calc_circ_rect_centers(image, range_names):
+  def calc_circ_centers(image, range_names):
     # The box could be entirely hidden by the robot, so we can't assume both orange regions are
     # visible and use watershedding. We would want to erode to remove noise, but the box is quite
     # small and eroding can erode it entirely
@@ -46,7 +46,7 @@ def calc_positions_and_angles(image_1, image_2):
         stats[cv2.CC_STAT_TOP] + stats[cv2.CC_STAT_HEIGHT] / 2,
       ])
 
-    def calc_circ_rect_center(colour_range):
+    def calc_circ_center(colour_range):
       mask = cv2.inRange(image, *colour_range)
       mask = cv2.dilate(mask, dilate_kernel, iterations=3)
       _, _, stats, _ = cv2.connectedComponentsWithStats(mask)
@@ -58,11 +58,11 @@ def calc_positions_and_angles(image_1, image_2):
       stats = stats[np.apply_along_axis(area_proportion, 1, stats).argsort()]  # Sort by proportion of area
 
       return \
-        (centre(stats[0]), centre(stats[1])) if stats.shape[0] == 2 else \
-        (None, None)
+        centre(stats[0]) if stats.shape[0] == 2 else \
+        None
 
     return {
-      range_name: calc_circ_rect_center(colour_ranges[range_name])
+      range_name: calc_circ_center(colour_ranges[range_name])
       for range_name in range_names
     }
 
@@ -90,8 +90,8 @@ def calc_positions_and_angles(image_1, image_2):
   joint_centers_2 = calc_center_of_masses(image_2, joint_range_names)
 
   # Find orange object positions
-  orange_circ_center_1, orange_rect_center_1 = calc_circ_rect_centers(image_1, ('orange',))['orange']
-  orange_circ_center_2, orange_rect_center_2 = calc_circ_rect_centers(image_2, ('orange',))['orange']
+  orange_circ_center_1 = calc_circ_centers(image_1, ('orange',))['orange']
+  orange_circ_center_2 = calc_circ_centers(image_2, ('orange',))['orange']
 
   # Use blue and yellow to convert from pixels to meters, since we know/assume they can't be
   # obscured, know the meter distance between them, and they can't move
@@ -114,16 +114,13 @@ def calc_positions_and_angles(image_1, image_2):
     range_name: pixel_coords_to_meters_2(coords) for range_name, coords in joint_centers_2.items()
   }
   orange_circ_center_1 = pixel_coords_to_meters_1(orange_circ_center_1)
-  orange_rect_center_1 = pixel_coords_to_meters_1(orange_rect_center_1)
   orange_circ_center_2 = pixel_coords_to_meters_2(orange_circ_center_2)
-  orange_rect_center_2 = pixel_coords_to_meters_2(orange_rect_center_2)
 
   # Combine the 2D coordinates to 3D
   joint_centers = {
     range_name: coords_2d_to_3d(joint_centers_1[range_name], joint_centers_2[range_name]) for range_name in joint_range_names
   }
   orange_circ_center = coords_2d_to_3d(orange_circ_center_1, orange_circ_center_2)
-  orange_rect_center = coords_2d_to_3d(orange_rect_center_1, orange_rect_center_2)
 
   green_to_red = joint_centers['red'] - joint_centers['green']
   blue_to_green = joint_centers['green'] - joint_centers['blue']
@@ -150,6 +147,5 @@ def calc_positions_and_angles(image_1, image_2):
   return {
     'joint_centers': joint_centers,
     'orange_circ_center': orange_circ_center,
-    'orange_rect_center': orange_rect_center,
     'q': np.array([link_1, link_2, link_3, link_4]),
   }
