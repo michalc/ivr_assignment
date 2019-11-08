@@ -120,7 +120,7 @@ def main():
     print('k', k)
 
     joint1_pub.publish(Float64(data=q_d[0]))
-    joint2_pub.publish(Float64(data=q_d[1]))
+    joint2_pub.publish(Float64(data=max(q_d[1], 0.0)))
     joint3_pub.publish(Float64(data=0.0))
     joint4_pub.publish(Float64(data=q_d[2]))
 
