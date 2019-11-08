@@ -25,10 +25,15 @@ def main():
     'q': None,
     'desired_joint_config': [
       np.array([0.0, 0.0, 0.0, 0.0]),
-      np.array([np.pi/4, np.pi/4, 0.0, np.pi/4]),
-      np.array([np.pi/4, np.pi/4, 0.0, np.pi/2]),
-      np.array([np.pi/2, np.pi/4, 0.0, np.pi/4]),
-      np.array([3*np.pi/4, np.pi/4, 0.0, np.pi/2]),
+      np.array([1.0, 0.0, 0.0, 0.0]),  # No visiual difference to 0.0, 0.0, 0.0, 0.0
+      np.array([1.0, 1.0, 0.0, 0.0]),
+      np.array([1.0, 1.0, 0.0, 1.0]),
+      np.array([0.0, 0.0, 0.0, 1.0]),
+      np.array([0.0, 1.0, 0.0, 1.0]),
+      np.array([1.0, 1.0, 0.0, 1.0]),
+      np.array([2.0, 1.0, 0.0, 1.0]),
+      np.array([2.0, np.pi/2, 0.0, np.pi/2]),
+      np.array([-2.0, np.pi/2, 0.0, -np.pi/2]),
     ],
   }
 
@@ -48,7 +53,7 @@ def main():
 
   def move_robot(_):
     try:
-      joint_config = state['desired_joint_config'].pop()
+      joint_config = state['desired_joint_config'].pop(0)
     except IndexError:
       rospy.core.signal_shutdown('No more joint configurations')
       return
