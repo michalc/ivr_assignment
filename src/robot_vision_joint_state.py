@@ -55,7 +55,7 @@ def main():
     joint4_pub.publish(Float64(data=angles[3]))
     rospy.sleep(3)
     print('Estimated angles:', state['q'])
-    joint4_pub.publish(Float64(data=state['q']))
+    joint4_pub.publish(Float64MultiArray(data=state['q']))
     rospy.Timer(rospy.Duration(1), move_robot, oneshot=True)
 
   rospy.Timer(rospy.Duration(3), move_robot, oneshot=True)
