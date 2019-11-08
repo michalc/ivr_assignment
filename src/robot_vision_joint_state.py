@@ -16,7 +16,7 @@ def main():
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
-  q_pub = rospy.Publisher("q", Float64, queue_size=10)
+  q_pub = rospy.Publisher("q", Float64MultiArray, queue_size=10)
   bridge = CvBridge()
 
   state = {
