@@ -4,7 +4,7 @@ import message_filters
 import numpy as np
 import rospy
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Float64MultiArray
 from cv_bridge import CvBridge
 
 from robot_vision import calc_positions_and_angles
@@ -16,6 +16,7 @@ def main():
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
+  q_pub = rospy.Publisher("q", Float64, queue_size=10)
   bridge = CvBridge()
 
   state = {
@@ -54,7 +55,7 @@ def main():
     joint4_pub.publish(Float64(data=angles[3]))
     rospy.sleep(3)
     print('Estimated angles:', state['q'])
-
+    joint4_pub.publish(Float64(data=state['q']))
     rospy.Timer(rospy.Duration(1), move_robot, oneshot=True)
 
   rospy.Timer(rospy.Duration(3), move_robot, oneshot=True)
