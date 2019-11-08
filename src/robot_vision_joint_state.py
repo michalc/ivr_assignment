@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import traceback
+
 import message_filters
 import numpy as np
 import rospy
@@ -31,9 +33,12 @@ def main():
   }
 
   def camera_callback(data_1, data_2):
-    image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
-    image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
-    state['q'] = calc_positions_and_angles(image_1, image_2)['q']
+    try:
+      image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
+      image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
+      state['q'] = calc_positions_and_angles(image_1, image_2)['q']
+    except Exception as ex:
+      traceback.print_exc()
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
