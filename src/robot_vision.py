@@ -122,27 +122,25 @@ def calc_positions_and_angles(image_1, image_2):
   }
   target_center = coords_2d_to_3d(target_center_1, target_center_2)
 
-  green_to_red = joint_centers['red'] - joint_centers['green']
-  blue_to_green = joint_centers['green'] - joint_centers['blue']
-  yellow_to_blue = joint_centers['blue'] - joint_centers['yellow']
-  green_to_red_norm = np.linalg.norm(green_to_red)
-  blue_to_green_norm = np.linalg.norm(blue_to_green)
-  yellow_to_blue_norm = np.linalg.norm(yellow_to_blue)
 
-  # For simplicity and to deal with visually indistinguisable states, we enforce that link_3 is 0.0
-  y_axis = np.array([0.0, 1.0])
-  y_axis_norm = 1.0
-  blue_x_y = np.array([joint_centers['blue'][0], joint_centers['blue'][1]])
-  red_x_y = np.array([joint_centers['red'][0], joint_centers['red'][1]])
-  red_to_blue = blue_x_y - red_x_y
-  red_to_blue_norm = np.linalg.norm(red_to_blue)
+  link_1 = np.arctan2(joint_centers['green'][0], -joint_centers['green'][1])
 
-  link_1 = \
-    np.arccos(np.dot(red_to_blue, y_axis) / (red_to_blue_norm * y_axis_norm)) if red_to_blue_norm else \
-    0.0  # If red to blue is completely vertical, we just assume no rotation
-  link_2 = np.arccos(np.dot(blue_to_green, yellow_to_blue) / (blue_to_green_norm * yellow_to_blue_norm))
+  # We keep link 3 == 0, and keep link 2 +ve so all joints are in a plane,
+  # rotated from the yz plane by link_1. So we rotate by -link_1 to then be
+  # able to use atan2 to find the remaining link angles
+  rotation = np.array([
+    [np.cos(-link_1), -np.sin(-link_1), 0],
+    [np.sin(-link_1), np.cos(-link_1), 0],
+    [0, 0, 1],
+  ])
+  green_rot = rotation.dot(joint_centers['green'])
+  red_rot = rotation.dot(joint_centers['red'])
+
+  link_2 = np.arctan2(-green_rot[1], green_rot[2] - 2)
   link_3 = 0.0
-  link_4 = np.arccos(np.dot(green_to_red, blue_to_green) / (green_to_red_norm * blue_to_green_norm))
+
+  red_green_diff = red_rot - green_rot
+  link_4 = np.arctan2(-red_green_diff[1], red_green_diff[2]) - link_2
 
   return {
     'joint_centers': joint_centers,
