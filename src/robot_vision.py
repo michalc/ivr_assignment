@@ -122,7 +122,8 @@ def calc_positions_and_angles(image_1, image_2):
   }
   target_center = coords_2d_to_3d(target_center_1, target_center_2)
 
-
+  # Deliberatly don't compare to the estimate of blue. The estimate can only
+  # be worse than reality
   link_1 = np.arctan2(joint_centers['green'][0], -joint_centers['green'][1])
 
   # We keep link 3 == 0, and keep link 2 +ve so all joints are in a plane,
