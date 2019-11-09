@@ -10,9 +10,9 @@ from cv_bridge import CvBridge
 from robot_vision import calc_positions_and_angles
 
 K_p = np.array([
-  [1.0, 0.0, 0.0],
-  [0.0, 1.0, 0.0],
-  [0.0, 0.0, 1.0],
+  [0.5, 0.0, 0.0],
+  [0.0, 0.5, 0.0],
+  [0.0, 0.0, 0.5],
 ])
 K_d = np.array([
   [0.1, 0.0, 0.0],
@@ -119,8 +119,16 @@ def main():
     k = calc_k(positions_and_angles['q'])
     print('k', k)
 
+    # The inverse kinematics doesn't know about contraints/allowed robot
+    # Configurations
+    if q_d[0] > np.pi:
+      q_d[0] -= 2 * np.pi
+    if q_d[0] < -np.pi:
+      q_d[0] += 2 * np.pi
+    q_d[1] = max(q_d[1], 0.0)
+
     joint1_pub.publish(Float64(data=q_d[0]))
-    joint2_pub.publish(Float64(data=max(q_d[1], 0.0)))
+    joint2_pub.publish(Float64(data=q_d[1]))
     joint3_pub.publish(Float64(data=0.0))
     joint4_pub.publish(Float64(data=q_d[2]))
 
