@@ -10,9 +10,9 @@ from cv_bridge import CvBridge
 from robot_vision import calc_positions_and_angles
 
 K_p = np.array([
-  [0.5, 0.0, 0.0],
-  [0.0, 0.5, 0.0],
-  [0.0, 0.0, 0.5],
+  [2.0, 0.0, 0.0],
+  [0.0, 2.0, 0.0],
+  [0.0, 0.0, 2.0],
 ])
 K_d = np.array([
   [0.1, 0.0, 0.0],
