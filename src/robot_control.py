@@ -29,20 +29,6 @@ def main():
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
 
-  def calc_k(q):
-    # cos and sin functions take 1-indexed as in mathematical notation
-    def c(i):
-      return np.cos(q[i - 1])
-
-    def s(i):
-      return np.sin(q[i - 1])
-
-    return np.array([
-       3*c(1)*c(3) + 2*c(2)*s(1)*s(4) + 3*c(3)*s(1)*s(2) + 2*c(4)*(c(1)*c(3) + c(3)*s(1)*s(2)),
-      -2*c(1)*c(2)*s(4) - 3*c(1)*c(3)*s(2) + 2*c(4)*(-c(1)*c(3)*s(2) + s(1)*c(3)) + 3*s(1)*c(3),
-       2*c(2)*c(3)*c(4) + 3*c(2)*c(3) - 2*s(2)*s(4) + 2,
-    ])
-
   def calc_jacobian(q):
     # cos and sin functions take 1-indexed as in mathematical notation
     def c(i):
@@ -53,21 +39,21 @@ def main():
 
     return np.array([
       [
-        2*c(1)*c(2)*s(4) + 3*c(1)*c(3)*s(2) + c(4)*(2*c(1)*c(3)*s(2) - 2*s(1)*c(3)) - 3*s(1)*c(3),
+        2*c(1)*c(2)*s(4) + 3*c(1)*c(3)*s(2) + c(4)*(2*c(1)*c(3)*s(2) - 2*s(1)*s(3)) - 3*s(1)*s(3),
         2*c(2)*c(3)*c(4)*s(1) + 3*c(2)*c(3)*s(1) - 2*s(1)*s(2)*s(4),
-        3*c(1)*c(3) + c(4)*(2*c(1)*c(3) - 2*s(1)*s(2)*c(3)) - 3*s(1)*s(2)*c(3),
-        2*c(2)*c(4)*s(1) - s(4)*(2*c(1)*c(3) + 2*c(3)*s(1)*s(2))
+        3*c(1)*c(3) + c(4)*(2*c(1)*c(3) - 2*s(1)*s(2)*s(3)) - 3*s(1)*s(2)*s(3),
+        2*c(2)*c(4)*s(1) - s(4)*(2*c(1)*s(3) + 2*c(3)*s(1)*s(2)),
       ],
       [
-        3*c(1)*c(3) + 2*c(2)*s(1)*s(4) + 3*c(3)*s(1)*s(2) + c(4)*(2*c(1)*c(3) + 2*c(3)*s(1)*s(2)),
+        3*c(1)*s(3) + 2*c(2)*s(1)*s(4) + 3*c(3)*s(1)*s(2) + c(4)*(2*c(1)*s(3) + 2*c(3)*s(1)*s(2)),
         -2*c(1)*c(2)*c(3)*c(4) - 3*c(1)*c(2)*c(3) + 2*c(1)*s(2)*s(4),
-        3*c(1)*s(2)*c(3) + 3*c(3)*s(1) + c(4)*(2*c(1)*s(2)*c(3) + 2*c(3)*s(1)),
-        -2*c(1)*c(2)*c(4) - s(4)*(-2*c(1)*c(3)*s(2) + 2*s(1)*c(3)),
+        3*c(1)*s(2)*s(3) + 3*c(3)*s(1) + c(4)*(2*c(1)*s(2)*s(3) + 2*c(3)*s(1)),
+        -2*c(1)*c(2)*c(4) - s(4)*(-2*c(1)*c(3)*s(2) + 2*s(1)*s(3)),
       ],
       [
         0,
         -2*c(2)*s(4) - 2*c(3)*c(4)*s(2) - 3*c(3)*s(2),
-        -2*c(2)*c(4)*c(3) - 3*c(2)*c(3),
+        -2*c(2)*c(4)*s(3) - 3*c(2)*s(3),
         -2*c(2)*c(3)*s(4) - 2*c(4)*s(2),
       ],
     ])
@@ -115,9 +101,6 @@ def main():
 
     q_d = q_const + dt * jacobian_inv.dot(K_p.dot(e_t) + K_d.dot(de))
     print('q_d', q_d)
-
-    k = calc_k(positions_and_angles['q'])
-    print('k', k)
 
     # The inverse kinematics doesn't know about contraints/allowed robot
     # Configurations
