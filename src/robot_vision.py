@@ -6,11 +6,21 @@ import numpy as np
 
 colour_ranges = {
   # Ranges handle the slight shadow towards the bottom of the objects
-  'yellow': ((0, 100, 100), (50, 255, 255)),
-  'blue': ((100, 0, 0), (255, 50, 50)),
-  'green': ((0, 100, 0), (50, 255, 50)),
-  'red': ((0, 0, 100), (50, 50, 255)),
-  'orange': ((75, 110, 130), (95, 175, 220)),
+  'yellow': (
+    ((0, 100, 100), (50, 255, 255)),
+  ),
+  'blue': (
+    ((100, 0, 0), (255, 50, 50)),
+  ),
+  'green': (
+    ((0, 100, 0), (50, 255, 50))
+  ),
+  'red': (
+    ((0, 0, 100), (50, 50, 255))
+  ),
+  'orange': (
+    ((75, 110, 130), (95, 175, 220))
+  ),
 }
 dilate_kernel = np.ones((5, 5), np.uint8)
 
@@ -19,7 +29,10 @@ def calc_positions_and_angles(image_1, image_2):
 
   def calc_center_of_masses(image, range_names):
     def calc_center_of_mass(colour_range):
-      mask = cv2.inRange(image, *colour_range)
+      mask = np.zeros(image.shape[:2], image.dtype)
+      for c_range in colour_range:
+        mask = mask | cv2.inRange(image, *c_range)
+
       # Dilation gives a better center of mass calculation, since it partially compensates for
       # occlusion, as long there is only one source of the colour, and the real-world shape is
       # fairly regular
