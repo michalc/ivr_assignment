@@ -38,7 +38,9 @@ def calc_positions_and_angles(image_1, image_2):
       # fairly regular
       mask = cv2.dilate(mask, dilate_kernel, iterations=3)
       M = cv2.moments(mask)
-      return np.array([int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])])
+      return \
+        np.array([int(M['m10'] / M['m00']), int(M['m01'] / M['m00'])]) if M['m00'] != 0.0 else \
+        None
 
     return {
       range_name: calc_center_of_mass(colour_ranges[range_name])
