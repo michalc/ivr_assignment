@@ -13,13 +13,13 @@ colour_ranges = {
     ((100, 0, 0), (255, 50, 50)),
   ),
   'green': (
-    ((0, 100, 0), (50, 255, 50))
+    ((0, 100, 0), (50, 255, 50)),
   ),
   'red': (
-    ((0, 0, 100), (50, 50, 255))
+    ((0, 0, 100), (50, 50, 255)),
   ),
   'orange': (
-    ((75, 110, 130), (95, 175, 220))
+    ((75, 110, 130), (95, 175, 220)),
   ),
 }
 dilate_kernel = np.ones((5, 5), np.uint8)
@@ -62,7 +62,10 @@ def calc_positions_and_angles(image_1, image_2):
       ])
 
     def calc_circ_center(colour_range):
-      mask = cv2.inRange(image, *colour_range)
+      mask = np.zeros(image.shape[:2], image.dtype)
+      for c_range in colour_range:
+        mask = mask | cv2.inRange(image, *c_range)
+
       mask = cv2.dilate(mask, dilate_kernel, iterations=3)
       _, _, stats, _ = cv2.connectedComponentsWithStats(mask)
 
