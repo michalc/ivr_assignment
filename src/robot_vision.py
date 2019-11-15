@@ -17,12 +17,14 @@ colour_ranges = {
     (nhsv(65,0,0), nhsv(125, 100, 100)),
   ),
   'red': (
-    (nhsv(0,90,30), nhsv(4,100,100)),
+    (nhsv(0,90,30), nhsv(4,100,100)),  # Red
+    (nhsv(5,0,0), nhsv(20,100,100)),   # Red + orange
   ),
   'orange': (
     # Two ranges, since in the middle we have yellow
     (nhsv(35,0,0), nhsv(50,100,100)),     # Orange
     (nhsv(65,0,0), nhsv(100, 100, 100)),  # Orange + green
+    (nhsv(5,0,0),  nhsv(20,100,100)),     # Red + orange
   )
 }
 dilate_kernel = np.ones((5, 5), np.uint8)
@@ -53,36 +55,17 @@ def calc_positions_and_angles(image_1, image_2):
     }
 
   def calc_circ_centers(image, range_names):
-    # The box could be entirely hidden by the robot, so we can't assume both orange regions are
-    # visible and use watershedding. We would want to erode to remove noise, but the box is quite
-    # small and eroding can erode it entirely
-
-    def area_proportion(stats):
-      return float(stats[cv2.CC_STAT_AREA]) / (stats[cv2.CC_STAT_HEIGHT] * stats[cv2.CC_STAT_WIDTH])
-
-    def centre(stats):
-      return np.array([
-        stats[cv2.CC_STAT_LEFT] + stats[cv2.CC_STAT_WIDTH] / 2,
-        stats[cv2.CC_STAT_TOP] + stats[cv2.CC_STAT_HEIGHT] / 2,
-      ])
-
     def calc_circ_center(colour_range):
       mask = np.zeros(image.shape[:2], image.dtype)
       for c_range in colour_range:
         mask = mask | cv2.inRange(image, *c_range)
 
-      mask = cv2.dilate(mask, dilate_kernel, iterations=3)
-      _, _, stats, _ = cv2.connectedComponentsWithStats(mask)
-
-      # Rough way to distinguish circle from rectangle if both quite visible: the rectangle will
-      # have a larger proportion of pixels in its bounding box
-      stats = stats[stats[:,cv2.CC_STAT_HEIGHT] != image.shape[0]]             # Remove background
-      stats = stats[stats[:,cv2.CC_STAT_AREA].argsort()][-2:]                  # Take the largest two by area, in case of extra noise
-      stats = stats[np.apply_along_axis(area_proportion, 1, stats).argsort()]  # Sort by proportion of area
+      blur = cv2.GaussianBlur(mask, (7,7), 0)
+      houghcircles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=1000, param1=10, param2=20, minRadius=8, maxRadius=17)
 
       return \
-        centre(stats[0]) if stats.shape[0] == 2 else \
-        None
+        None if houghcircles is None else \
+        houghcircles[0,0,:2]
 
     return {
       range_name: calc_circ_center(colour_ranges[range_name])
