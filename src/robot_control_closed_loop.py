@@ -84,6 +84,8 @@ def main():
     e_t = x_t - x_e
 
     dt = now - state['t_-1']
+    if dt == 0:
+      return
     dx = (x_t - state['x_-1']) / dt
     de = (e_t - state['e_-1']) / dt
 
