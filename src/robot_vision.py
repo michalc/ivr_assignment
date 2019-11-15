@@ -3,29 +3,34 @@
 import cv2
 import numpy as np
 
+def nhsv(*hsv):
+  return (hsv[0] * 180/360, hsv[1] * 255/100, hsv[2] * 255/100)
 
 colour_ranges = {
-  # Ranges handle the slight shadow towards the bottom of the objects
   'yellow': (
-    ((0, 100, 100), (50, 255, 255)),
+    (nhsv(59,0,0), nhsv(60,100,100)),
   ),
   'blue': (
-    ((100, 0, 0), (255, 50, 50)),
+    (nhsv(230,90,20), nhsv(240,100,100)),
   ),
   'green': (
-    ((0, 100, 0), (50, 255, 50)),
+    (nhsv(65,0,0), nhsv(125, 100, 100)),
   ),
   'red': (
-    ((0, 0, 100), (50, 50, 255)),
+    (nhsv(0,90,30), nhsv(4,100,100)),
   ),
   'orange': (
-    ((75, 110, 130), (95, 175, 220)),
-  ),
+    # Two ranges, since in the middle we have yellow
+    (nhsv(35,0,0), nhsv(50,100,100)),     # Orange
+    (nhsv(65,0,0), nhsv(100, 100, 100)),  # Orange + green
+  )
 }
 dilate_kernel = np.ones((5, 5), np.uint8)
 
 
 def calc_positions_and_angles(image_1, image_2):
+  image_1 = cv2.cvtColor(image_1, cv2.COLOR_BGR2HSV)
+  image_2 = cv2.cvtColor(image_2, cv2.COLOR_BGR2HSV)
 
   def calc_center_of_masses(image, range_names):
     def calc_center_of_mass(colour_range):
