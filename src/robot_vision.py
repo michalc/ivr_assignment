@@ -54,23 +54,19 @@ def calc_positions_and_angles(image_1, image_2):
       for range_name in range_names
     }
 
-  def calc_circ_centers(image, range_names):
-    def calc_circ_center(colour_range):
-      mask = np.zeros(image.shape[:2], image.dtype)
-      for c_range in colour_range:
-        mask = mask | cv2.inRange(image, *c_range)
+  def calc_circ_center(image, range_name):
+    colour_range = colour_ranges[range_name]
 
-      blur = cv2.GaussianBlur(mask, (7,7), 0)
-      houghcircles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=1000, param1=10, param2=20, minRadius=8, maxRadius=17)
+    mask = np.zeros(image.shape[:2], image.dtype)
+    for c_range in colour_range:
+      mask = mask | cv2.inRange(image, *c_range)
 
-      return \
-        None if houghcircles is None else \
-        houghcircles[0,0,:2]
+    blur = cv2.GaussianBlur(mask, (7,7), 0)
+    houghcircles = cv2.HoughCircles(blur, cv2.HOUGH_GRADIENT, dp=1, minDist=1000, param1=10, param2=20, minRadius=8, maxRadius=17)
 
-    return {
-      range_name: calc_circ_center(colour_ranges[range_name])
-      for range_name in range_names
-    }
+    return \
+      None if houghcircles is None else \
+      houghcircles[0,0,:2]
 
   def pixel_coords_to_meters_converter(meters_per_pixel, origin_pixels):
     def _coords_convert(coords_pixels):
@@ -96,8 +92,8 @@ def calc_positions_and_angles(image_1, image_2):
   joint_centers_2 = calc_center_of_masses(image_2, joint_range_names)
 
   # Find orange object positions
-  target_center_1 = calc_circ_centers(image_1, ('orange',))['orange']
-  target_center_2 = calc_circ_centers(image_2, ('orange',))['orange']
+  target_center_1 = calc_circ_center(image_1, 'orange')
+  target_center_2 = calc_circ_center(image_2, 'orange')
 
   # Use blue and yellow to convert from pixels to meters, since we know/assume they can't be
   # obscured, know the meter distance between them, and they can't move
