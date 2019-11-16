@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float64, Float64MultiArray
 from cv_bridge import CvBridge
 
-from robot_vision import calc_positions_and_angles
+from shared import calc_positions_and_angles
 
 
 def main():
@@ -24,10 +24,11 @@ def main():
   state = {
     'q': None,
     'desired_joint_config': [
+      # As in lecture can be between 0 and 1
       np.array([0.0, 0.0, 0.0, 0.0]),
-      np.array([1.0, 0.0, 0.0, 0.0]),  # No visiual difference to 0.0, 0.0, 0.0, 0.0
+      np.array([1.0, 0.0, 0.0, 0.0]),
       np.array([1.0, 1.0, 0.0, 0.0]),
-      np.array([1.0, 1.0, 0.0, 1.0]),
+      np.array([0.0, 1.0, 0.0, 1.0]),
       np.array([0.0, 0.0, 0.0, 1.0]),
       np.array([0.0, 1.0, 0.0, 1.0]),
       np.array([1.0, 1.0, 0.0, 1.0]),

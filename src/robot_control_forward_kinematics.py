@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float64, Float64MultiArray
 from cv_bridge import CvBridge
 
-from robot_vision import calc_k, calc_positions_and_angles
+from shared import calc_k, calc_positions_and_angles
 
 
 def main():

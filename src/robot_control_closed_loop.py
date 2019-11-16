@@ -7,7 +7,7 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-from robot_vision import calc_jacobian, calc_positions_and_angles
+from shared import calc_jacobian, calc_positions_and_angles
 
 K_p = np.array([
   [2.0, 0.0, 0.0],
