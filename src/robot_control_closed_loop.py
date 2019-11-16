@@ -7,7 +7,7 @@ from std_msgs.msg import Float64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-from robot_vision import calc_positions_and_angles
+from robot_vision import calc_jacobian, calc_positions_and_angles
 
 K_p = np.array([
   [2.0, 0.0, 0.0],
@@ -28,35 +28,6 @@ def main():
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
-
-  def calc_jacobian(q):
-    # cos and sin functions take 1-indexed as in mathematical notation
-    def c(i):
-      return np.cos(q[i - 1])
-
-    def s(i):
-      return np.sin(q[i - 1])
-
-    return np.array([
-      [
-        2*c(1)*c(2)*s(4) + 3*c(1)*c(3)*s(2) + c(4)*(2*c(1)*c(3)*s(2) - 2*s(1)*s(3)) - 3*s(1)*s(3),
-        2*c(2)*c(3)*c(4)*s(1) + 3*c(2)*c(3)*s(1) - 2*s(1)*s(2)*s(4),
-        3*c(1)*c(3) + c(4)*(2*c(1)*c(3) - 2*s(1)*s(2)*s(3)) - 3*s(1)*s(2)*s(3),
-        2*c(2)*c(4)*s(1) - s(4)*(2*c(1)*s(3) + 2*c(3)*s(1)*s(2)),
-      ],
-      [
-        3*c(1)*s(3) + 2*c(2)*s(1)*s(4) + 3*c(3)*s(1)*s(2) + c(4)*(2*c(1)*s(3) + 2*c(3)*s(1)*s(2)),
-        -2*c(1)*c(2)*c(3)*c(4) - 3*c(1)*c(2)*c(3) + 2*c(1)*s(2)*s(4),
-        3*c(1)*s(2)*s(3) + 3*c(3)*s(1) + c(4)*(2*c(1)*s(2)*s(3) + 2*c(3)*s(1)),
-        -2*c(1)*c(2)*c(4) - s(4)*(-2*c(1)*c(3)*s(2) + 2*s(1)*s(3)),
-      ],
-      [
-        0,
-        -2*c(2)*s(4) - 2*c(3)*c(4)*s(2) - 3*c(3)*s(2),
-        -2*c(2)*c(4)*s(3) - 3*c(2)*s(3),
-        -2*c(2)*c(3)*s(4) - 2*c(4)*s(2),
-      ],
-    ])
 
   def constrain_link_3(q, jacobian):
     return np.delete(q, 2,), np.delete(jacobian, 2, 1)
