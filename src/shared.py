@@ -167,6 +167,24 @@ def calc_k(q):
   ])
 
 
+def calc_k_to_green(q):
+  # Forward kinematics, but only to to the green joint, so we can get enough
+  # equations to solve for the four angles numerically
+
+  # cos and sin functions take 1-indexed as in mathematical notation
+  def c(i):
+    return np.cos(q[i - 1])
+
+  def s(i):
+    return np.sin(q[i - 1])
+
+  return np.array([
+    3*c(1)*s(3) + 3*c(3)*s(1)*s(2),
+    -3*c(1)*c(3)*s(2) + 3*s(1)*s(3),
+     3*c(2)*c(3) + 2,
+  ])
+
+
 def calc_jacobian(q):
   # cos and sin functions take 1-indexed as in mathematical notation
   def c(i):
