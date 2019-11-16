@@ -150,3 +150,18 @@ def calc_positions_and_angles(image_1, image_2):
     'target_center': target_center,
     'q': np.array([link_1, link_2, link_3, link_4]),
   }
+
+
+def calc_k(q):
+  # cos and sin functions take 1-indexed as in mathematical notation
+  def c(i):
+    return np.cos(q[i - 1])
+
+  def s(i):
+    return np.sin(q[i - 1])
+
+  return np.array([
+    3*c(1)*s(3) + 2*c(2)*s(1)*s(4) + 3*c(3)*s(1)*s(2) + 2*c(4)*(c(1)*s(3) + c(3)*s(1)*s(2)),
+    -2*c(1)*c(2)*s(4) - 3*c(1)*c(3)*s(2) + 2*c(4)*(-c(1)*c(3)*s(2) + s(1)*s(3)) + 3*s(1)*s(3),
+    2*c(2)*c(3)*c(4) + 3*c(2)*c(3) - 2*s(2)*s(4) + 2,
+  ])
