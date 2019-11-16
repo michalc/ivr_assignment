@@ -2,6 +2,7 @@
 
 import cv2
 import numpy as np
+from scipy import optimize
 
 def nhsv(*hsv):
   return (hsv[0] * 180/360, hsv[1] * 255/100, hsv[2] * 255/100)
@@ -213,3 +214,27 @@ def calc_jacobian(q):
       -2*c(2)*c(3)*s(4) - 2*c(4)*s(2),
     ],
   ])
+
+
+def calc_positions_and_angles_least_squares(image_1, image_2):
+  pos_angles = calc_positions_and_angles(image_1, image_2)
+
+  # Function to minimise
+  def residual(q):
+    return np.concatenate([
+      pos_angles['joint_centers']['red'] - calc_k(q),
+      pos_angles['joint_centers']['green'] - calc_k_to_green(q),
+    ])
+
+  q_0 = np.array([0.5, 0.5, 0.5, 0.5])
+  bounds = (
+    np.array([-np.pi, -np.pi/2, -np.pi/2, -np.pi/2]),
+    np.array([np.pi, np.pi/2, np.pi/2, np.pi/2]),
+  )
+  result = optimize.least_squares(residual, q_0, bounds=bounds)
+
+  return {
+    'joint_centers': pos_angles['joint_centers'],
+    'target_center': pos_angles['target_center'],
+    'q': result.x,
+  }
