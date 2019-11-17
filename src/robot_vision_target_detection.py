@@ -13,8 +13,8 @@ from shared import calc_positions_and_angles
 
 
 def main():
-  rospy.init_node('robot_vision_join_state', anonymous=True)
-  target_pub = rospy.Publisher("target", Float64MultiArray, queue_size=10)
+  rospy.init_node('robot_vision_joint_state', anonymous=True)
+  target_pub = rospy.Publisher("target_estimate", Float64MultiArray, queue_size=10)
   bridge = CvBridge()
 
   def camera_callback(data_1, data_2):
