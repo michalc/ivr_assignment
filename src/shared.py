@@ -92,6 +92,17 @@ def calc_positions_and_angles(image_1, image_2):
   joint_centers_1 = calc_center_of_masses(image_1, joint_range_names)
   joint_centers_2 = calc_center_of_masses(image_2, joint_range_names)
 
+  # If the joints are completely hidden, based on our knowledge of the structure
+  # of the robot and positions of the cameras, we make some rough guesses
+  if joint_centers_1['red'] is None and joint_centers_1['green'] is not None:
+    joint_centers_1['red'] = joint_centers_1['green']
+  if joint_centers_1['green'] is None and joint_centers_1['red'] is not None:
+    joint_centers_1['green'] = joint_centers_1['red']
+  if joint_centers_2['red'] is None and joint_centers_2['green'] is not None:
+    joint_centers_2['red'] = joint_centers_2['green']
+  if joint_centers_2['green'] is None and joint_centers_2['red'] is not None:
+    joint_centers_2['green'] = joint_centers_2['red']
+
   # Find orange object positions
   target_center_1 = calc_circ_center(image_1, 'orange')
   target_center_2 = calc_circ_center(image_2, 'orange')
