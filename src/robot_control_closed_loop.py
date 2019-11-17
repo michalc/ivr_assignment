@@ -3,11 +3,11 @@
 import message_filters
 import numpy as np
 import rospy
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64, Float64MultiArray
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-from shared import calc_jacobian, calc_positions_and_angles
+from shared import calc_k, calc_jacobian, calc_positions_and_angles
 
 K_p = np.array([
   [2.0, 0.0, 0.0],
@@ -28,6 +28,7 @@ def main():
   joint2_pub = rospy.Publisher("/robot/joint2_position_controller/command", Float64, queue_size=10)
   joint3_pub = rospy.Publisher("/robot/joint3_position_controller/command", Float64, queue_size=10)
   joint4_pub = rospy.Publisher("/robot/joint4_position_controller/command", Float64, queue_size=10)
+  k_pub = rospy.Publisher("/k", Float64MultiArray, queue_size=10)
 
   def constrain_link_3(q, jacobian):
     return np.delete(q, 2,), np.delete(jacobian, 2, 1)
@@ -87,6 +88,9 @@ def main():
     joint2_pub.publish(Float64(data=q_d[1]))
     joint3_pub.publish(Float64(data=0.0))
     joint4_pub.publish(Float64(data=q_d[2]))
+
+    k = calc_k(np.array([q_d[0], q_d[1], 0.0, q_d[2]]))
+    k_pub.publish(Float64MultiArray(data=k))
 
   camera_1_sub = message_filters.Subscriber('/camera1/robot/image_raw', Image)
   camera_2_sub = message_filters.Subscriber('/camera2/robot/image_raw', Image)
