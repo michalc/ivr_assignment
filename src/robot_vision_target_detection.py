@@ -23,7 +23,8 @@ def main():
       image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
       target_center = calc_positions_and_angles(image_1, image_2)['target_center']
       print('target_center', target_center)
-      target_pub.publish(Float64MultiArray(data=target_center))
+      if target_center is not None:
+        target_pub.publish(Float64MultiArray(data=target_center))
     except Exception as ex:
       traceback.print_exc()
 
