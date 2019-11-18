@@ -9,7 +9,7 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Float64, Float64MultiArray
 from cv_bridge import CvBridge
 
-from shared import calc_positions_and_angles
+from shared import calc_positions_and_angles_least_squares
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
     try:
       image_1 = bridge.imgmsg_to_cv2(data_1, 'bgr8')
       image_2 = bridge.imgmsg_to_cv2(data_2, 'bgr8')
-      state['q'] = calc_positions_and_angles(image_1, image_2)['q']
+      state['q'] = calc_positions_and_angles_least_squares(image_1, image_2)['q']
     except Exception as ex:
       traceback.print_exc()
 
