@@ -22,3 +22,5 @@ rosrun ivr_assignment robot_vision_joint_state_least_squares.py
 rosrun ivr_assignment robot_control_forward_kinematics_squares.py
 rosrun ivr_assignment robot_control_closed_loop_squares.py
 ```
+
+During the run of `robot_control_closed_loop.py`, the concurrent node `error.py` can be run to output basic statistics on the error between the effector position and the target position.
