@@ -15,7 +15,7 @@ rosrun ivr_assignment robot_control_forward_kinematics.py
 rosrun ivr_assignment robot_control_closed_loop.py
 ```
 
-The below nodes do not have such a contstraint, and use a least-squares method to determine the four link angles.
+The below nodes do not have such a constraint, and use a least-squares method to determine the four link angles.
 
 ```
 rosrun ivr_assignment robot_vision_joint_state_least_squares.py
