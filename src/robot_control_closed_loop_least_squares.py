@@ -70,7 +70,7 @@ def main():
 
       q = positions_and_angles['q']
       jacobian = calc_jacobian(positions_and_angles['q'])
-      jacobian_inv = np.linalg.pinv(jacobian_cons)
+      jacobian_inv = np.linalg.pinv(jacobian)
 
       q_d = q + dt * jacobian_inv.dot(K_p.dot(e_t) + K_d.dot(de))
       print('q_d', q_d)
