@@ -238,9 +238,11 @@ def calc_positions_and_angles_least_squares(image_1, image_2):
     ])
 
   q_0 = np.array([0.5, 0.5, 0.5, 0.5])
+  # We constrain link 1 to 1/2 of its range to avoid visually close by
+  # "far" solutions in terms of the angles
   bounds = (
-    np.array([-np.pi, -np.pi/2, -np.pi/2, -np.pi/2]),
-    np.array([np.pi, np.pi/2, np.pi/2, np.pi/2]),
+    np.array([-np.pi/2, -np.pi/2, -np.pi/2, -np.pi/2]),
+    np.array([np.pi/2, np.pi/2, np.pi/2, np.pi/2]),
   )
   result = optimize.least_squares(residual, q_0, bounds=bounds)
 
