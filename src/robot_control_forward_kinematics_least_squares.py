@@ -27,15 +27,15 @@ def main():
     'effector': None,
     'desired_joint_config': [
       np.array([0.0, 0.0, 0.0, 0.0]),
-      np.array([1.0, 0.0, 0.0, 0.0]),  # No visiual difference to 0.0, 0.0, 0.0, 0.0
-      np.array([1.0, 1.0, 0.0, 0.0]),
-      np.array([1.0, 1.0, 0.0, 1.0]),
-      np.array([0.0, 0.0, 0.0, 1.0]),
-      np.array([0.0, 1.0, 0.0, 1.0]),
-      np.array([1.0, 1.0, 0.0, 1.0]),
-      np.array([2.0, 1.0, 0.0, 1.0]),
-      np.array([2.0, np.pi/2, 0.0, np.pi/2]),
-      np.array([-2.0, np.pi/2, 0.0, -np.pi/2]),
+      np.array([0.2, 0.0, 0.0, 0.0]),
+      np.array([0.2, 0.2, 0.0, 0.2]),
+      np.array([0.4, 0.2, 0.0, 0.2]),
+      np.array([0.4, 0.4, 0.0, 0.2]),
+      np.array([0.4, 0.4, 0.0, 0.4]),
+      np.array([0.6, 0.4, 0.0, 0.4]),
+      np.array([0.6, 0.6, 0.0, 0.4]),
+      np.array([0.8, 0.8, 0.0, 0.8]),
+      np.array([1.2, 1.2, 0.0, 1.2]),
     ],
   }
 
