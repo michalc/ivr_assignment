@@ -24,7 +24,7 @@ def main():
   state = {
     'q': None,
     'desired_joint_config': [
-      # As in lecture can be between 0 and 1
+      # As in lecture can be a restricted range
       np.array([0.0, 0.0, 0.0, 0.0]),
       np.array([0.2, 0.0, 0.0, 0.0]),
       np.array([0.2, 0.2, 0.0, 0.2]),
@@ -33,8 +33,8 @@ def main():
       np.array([0.4, 0.4, 0.0, 0.4]),
       np.array([0.6, 0.4, 0.0, 0.4]),
       np.array([0.6, 0.6, 0.0, 0.4]),
-      np.array([0.6, 0.6, 0.0, 0.6]),
-      np.array([0.8, 0.2, 0.0, 0.2]),
+      np.array([0.8, 0.8, 0.0, 0.8]),
+      np.array([1.2, 1.2, 0.0, 1.2]),
     ],
   }
 
