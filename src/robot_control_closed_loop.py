@@ -79,8 +79,7 @@ def main():
       q_d = q_const + dt * jacobian_inv.dot(K_p.dot(e_t) + K_d.dot(de))
       print('q_d', q_d)
 
-      # The inverse kinematics doesn't know about contraints/allowed robot
-      # Configurations
+      # The inverse kinematics doesn't know about constraints/allowed configurations
       if q_d[0] > np.pi:
         q_d[0] -= 2 * np.pi
       if q_d[0] < -np.pi:
