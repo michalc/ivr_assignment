@@ -80,9 +80,9 @@ def main():
       print('q_d', q_d)
 
       # The inverse kinematics doesn't know about constraints/allowed configurations
-      if q_d[0] > np.pi:
+      while q_d[0] > np.pi:
         q_d[0] -= 2 * np.pi
-      if q_d[0] < -np.pi:
+      while q_d[0] < -np.pi:
         q_d[0] += 2 * np.pi
       q_d[1] = max(q_d[1], 0.0)
 
