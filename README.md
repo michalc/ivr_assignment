@@ -19,7 +19,7 @@ The below nodes do not have such a constraint, and use a least-squares method to
 
 ```
 rosrun ivr_assignment robot_vision_joint_state_least_squares.py
-rosrun ivr_assignment robot_control_forward_kinematics_squares.py
+rosrun ivr_assignment robot_control_forward_kinematics_least_squares.py
 rosrun ivr_assignment robot_control_closed_loop_squares.py
 ```
 
