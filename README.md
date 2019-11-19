@@ -1,6 +1,13 @@
 ivr_assignment
 ==============
 
+## Requirements
+
+rospy, numpy, scipy and opencv are required.
+
+
+## Running
+
 Separate nodes have been written for each part of the assignment: only one node at a time should be run.
 
 ```
